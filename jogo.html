@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xadrez - Projeto Completo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to right, #ffd700, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .board-container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .game-info {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        #chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            grid-template-rows: repeat(8, 60px);
+            border: 4px solid #5d4037;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+        }
+        
+        .square {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        
+        .light {
+            background-color: #f0d9b5;
+        }
+        
+        .dark {
+            background-color: #b58863;
+        }
+        
+        .square.selected {
+            background-color: #baca44;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .square.valid-move {
+            position: relative;
+        }
+        
+        .square.valid-move::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(0, 255, 0, 0.5);
+            z-index: 1;
+        }
+        
+        .square.castling-move::after {
+            content: "🏰";
+            position: absolute;
+            font-size: 24px;
+            z-index: 1;
+            opacity: 0.8;
+        }
+        
+        .piece {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        
+        .piece:hover {
+            transform: scale(1.1);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(145deg, #ffd700, #ff9800);
+            color: #1a1a1a;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(145deg, #ffff00, #ffb300);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .turn-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .turn-piece {
+            font-size: 2rem;
+        }
+        
+        .move-history {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .move-history h3 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        
+        .moves {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+        
+        .move {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+            max-width: 800px;
+            margin-top: 30px;
+            width: 100%;
+        }
+        
+        .instructions h2 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .instructions ul {
+            padding-left: 25px;
+            line-height: 1.8;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .special-moves {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+        }
+        
+        .special-moves h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            #chess-board {
+                grid-template-columns: repeat(8, 40px);
+                grid-template-rows: repeat(8, 40px);
+            }
+            
+            .square {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>♚ Jogo de Xadrez Completo ♔</h1>
+        <p>Com movimentos especiais de roque implementados</p>
+    </header>
+    
+    <div class="container">
+        <div class="board-container">
+            <div class="turn-indicator">
+                <span>Turno atual:</span>
+                <span id="turn-indicator" class="turn-piece">♔</span>
+                <span id="turn-text">Brancas</span>
+            </div>
+            <div id="chess-board"></div>
+            <div class="controls">
+                <button id="new-game">Novo Jogo</button>
+                <button id="undo-move">Desfazer Jogada</button>
+                <button id="flip-board">Girar Tabuleiro</button>
+            </div>
+        </div>
+        
+        <div class="game-info">
+            <div class="status">
+                <div>Status: <span id="game-status">Em andamento</span></div>
+                <div id="check-indicator"></div>
+            </div>
+            
+            <div class="move-history">
+                <h3>Histórico de Jogadas</h3>
+                <div id="moves-container" class="moves"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <h2>Como Jogar</h2>
+        <ul>
+            <li><strong>Brancas começam:</strong> As peças brancas fazem o primeiro movimento</li>
+            <li><strong>Seleção:</strong> Clique em uma peça para selecioná-la (destacada em verde)</li>
+            <li><strong>Movimento:</strong> Clique em uma casa marcada para mover a peça</li>
+            <li><strong>Peças:</strong> Rei (♔, ♚), Rainha (♕, ♛), Torre (♖, ♜), Bispo (♗, ♝), Cavalo (♘, ♞), Peão (♙, ♟)</li>
+            <li><strong>Xeque:</strong> Quando o rei está sob ataque, você deve protegê-lo no próximo movimento</li>
+            <li><strong>Xeque-mate:</strong> Quando o rei está sob ataque e não pode escapar - fim do jogo</li>
+        </ul>
+        
+        <div class="special-moves">
+            <h3>Movimentos Especiais</h3>
+            <ul>
+                <li><strong>Roque (Castling):</strong> Movimento especial envolvendo o rei e uma torre</li>
+                <li><strong>Roque Pequeno (O-O):</strong> Rei move-se duas casas em direção à torre do lado do rei, e a torre salta para a casa ao lado do rei</li>
+                <li><strong>Roque Grande (O-O-O):</strong> Rei move-se duas casas em direção à torre do lado da rainha, e a torre salta para a casa ao lado do rei</li>
+                <li><strong>Condições:</strong> Nem o rei nem a torre podem ter se movido anteriormente, não pode haver peças entre eles, e o rei não pode estar em xeque</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos do DOM
+            const chessBoard = document.getElementById('chess-board');
+            const movesContainer = document.getElementById('moves-container');
+            const gameStatus = document.getElementById('game-status');
+            const turnIndicator = document.getElementById('turn-indicator');
+            const turnText = document.getElementById('turn-text');
+            const checkIndicator = document.getElementById('check-indicator');
+            const newGameBtn = document.getElementById('new-game');
+            const undoBtn = document.getElementById('undo-move');
+            const flipBoardBtn = document.getElementById('flip-board');
+            
+            // Estado do jogo
+            let board = [];
+            let selectedPiece = null;
+            let validMoves = [];
+            let currentPlayer = 'white';
+            let moveHistory = [];
+            let boardFlipped = false;
+            let gameActive = true;
+            let castlingRights = {
+                white: { kingSide: true, queenSide: true },
+                black: { kingSide: true, queenSide: true }
+            };
+            
+            // Inicialização do jogo
+            function initGame() {
+                createBoard();
+                setupPieces();
+                renderBoard();
+                renderMoveHistory();
+                updateStatus();
+            }
+            
+            // Cria a estrutura do tabuleiro
+            function createBoard() {
+                chessBoard.innerHTML = '';
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        const square = document.createElement('div');
+                        square.classList.add('square');
+                        square.classList.add((row + col) % 2 === 0 ? 'light' : 'dark');
+                        square.dataset.row = row;
+                        square.dataset.col = col;
+                        square.addEventListener('click', handleSquareClick);
+                        chessBoard.appendChild(square);
+                    }
+                }
+            }
+            
+            // Configura as peças iniciais
+            function setupPieces() {
+                // Inicializa o tabuleiro vazio
+                board = Array(8).fill().map(() => Array(8).fill(null));
+                
+                // Peões
+                for (let i = 0; i < 8; i++) {
+                    board[1][i] = { type: 'pawn', color: 'black' };
+                    board[6][i] = { type: 'pawn', color: 'white' };
+                }
+                
+                // Peças principais - Brancas
+                board[7][0] = { type: 'rook', color: 'white' };
+                board[7][1] = { type: 'knight', color: 'white' };
+                board[7][2] = { type: 'bishop', color: 'white' };
+                board[7][3] = { type: 'queen', color: 'white' };
+                board[7][4] = { type: 'king', color: 'white' };
+                board[7][5] = { type: 'bishop', color: 'white' };
+                board[7][6] = { type: 'knight', color: 'white' };
+                board[7][7] = { type: 'rook', color: 'white' };
+                
+                // Peças principais - Pretas
+                board[0][0] = { type: 'rook', color: 'black' };
+                board[0][1] = { type: 'knight', color: 'black' };
+                board[0][2] = { type: 'bishop', color: 'black' };
+                board[0][3] = { type: 'queen', color: 'black' };
+                board[0][4] = { type: 'king', color: 'black' };
+                board[0][5] = { type: 'bishop', color: 'black' };
+                board[0][6] = { type: 'knight', color: 'black' };
+                board[0][7] = { type: 'rook', color: 'black' };
+                
+                // Resetar direitos de roque
+                castlingRights = {
+                    white: { kingSide: true, queenSide: true },
+                    black: { kingSide: true, queenSide: true }
+                };
+            }
+            
+            // Renderiza o tabuleiro
+            function renderBoard() {
+                const squares = document.querySelectorAll('.square');
+                
+                squares.forEach(square => {
+                    const row = parseInt(square.dataset.row);
+                    const col = parseInt(square.dataset.col);
+                    
+                    // Remove classes de seleção e movimento válido
+                    square.classList.remove('selected', 'valid-move', 'castling-move');
+                    
+                    // Remove qualquer peça existente
+                    square.innerHTML = '';
+                    
+                    // Adiciona a peça, se houver
+                    const piece = board[row][col];
+                    if (piece) {
+                        const pieceElement = document.createElement('div');
+                        pieceElement.classList.add('piece');
+                        pieceElement.textContent = getPieceSymbol(piece.type, piece.color);
+                        square.appendChild(pieceElement);
+                    }
+                });
+            }
+            
+            // Obtém o símbolo Unicode para a peça
+            function getPieceSymbol(type, color) {
+                const symbols = {
+                    king: { white: '♔', black: '♚' },
+                    queen: { white: '♕', black: '♛' },
+                    rook: { white: '♖', black: '♜' },
+                    bishop: { white: '♗', black: '♝' },
+                    knight: { white: '♘', black: '♞' },
+                    pawn: { white: '♙', black: '♟' }
+                };
+                return symbols[type][color];
+            }
+            
+            // Manipula o clique em uma casa
+            function handleSquareClick(event) {
+                if (!gameActive) return;
+                
+                const square = event.currentTarget;
+                const row = parseInt(square.dataset.row);
+                const col = parseInt(square.dataset.col);
+                const clickedPiece = board[row][col];
+                
+                // Desselecionar se clicar na mesma peça novamente
+                if (selectedPiece && selectedPiece.row === row && selectedPiece.col === col) {
+                    selectedPiece = null;
+                    validMoves = [];
+                    renderBoard();
+                    return;
+                }
+                
+                // Se já tem uma peça selecionada, tentar mover
+                if (selectedPiece) {
+                    // Verifica se o movimento é válido
+                    const isValidMove = validMoves.some(move => 
+                        move.row === row && move.col === col
+                    );
+                    
+                    if (isValidMove) {
+                        movePiece(selectedPiece.row, selectedPiece.col, row, col);
+                        selectedPiece = null;
+                        validMoves = [];
+                        return;
+                    }
+                }
+                
+                // Selecionar uma nova peça (se for do jogador atual)
+                if (clickedPiece && clickedPiece.color === currentPlayer) {
+                    selectedPiece = { row, col, piece: clickedPiece };
+                    square.classList.add('selected');
+                    calculateValidMoves(row, col, clickedPiece);
+                    highlightValidMoves();
+                }
+            }
+            
+            // Calcula movimentos válidos para uma peça
+            function calculateValidMoves(row, col, piece) {
+                validMoves = [];
+                
+                switch (piece.type) {
+                    case 'pawn':
+                        const direction = piece.color === 'white' ? -1 : 1;
+                        
+                        // Movimento para frente
+                        if (isInBoard(row + direction, col) && !board[row + direction][col]) {
+                            validMoves.push({ row: row + direction, col });
+                            
+                            // Primeiro movimento: duas casas
+                            if ((piece.color === 'white' && row === 6) || 
+                                (piece.color === 'black' && row === 1)) {
+                                if (!board[row + 2*direction][col]) {
+                                    validMoves.push({ row: row + 2*direction, col });
+                                }
+                            }
+                        }
+                        
+                        // Captura
+                        for (let offset of [-1, 1]) {
+                            const captureRow = row + direction;
+                            const captureCol = col + offset;
+                            
+                            if (isInBoard(captureRow, captureCol) && 
+                                board[captureRow][captureCol] && 
+                                board[captureRow][captureCol].color !== piece.color) {
+                                validMoves.push({ row: captureRow, col: captureCol });
+                            }
+                        }
+                        break;
+                        
+                    case 'knight':
+                        const knightMoves = [
+                            {r: -2, c: -1}, {r: -2, c: 1},
+                            {r: -1, c: -2}, {r: -1, c: 2},
+                            {r: 1, c: -2}, {r: 1, c: 2},
+                            {r: 2, c: -1}, {r: 2, c: 1}
+                        ];
+                        
+                        for (let move of knightMoves) {
+                            const newRow = row + move.r;
+                            const newCol = col + move.c;
+                            
+                            if (isInBoard(newRow, newCol) && 
+                                (!board[newRow][newCol] || board[newRow][newCol].color !== piece.color)) {
+                                validMoves.push({ row: newRow, col: newCol });
+                            }
+                        }
+                        break;
+                        
+                    case 'rook':
+                        addStraightMoves(row, col, piece);
+                        break;
+                        
+                    case 'bishop':
+                        addDiagonalMoves(row, col, piece);
+                        break;
+                        
+                    case 'queen':
+                        addStraightMoves(row, col, piece);
+                        addDiagonalMoves(row, col, piece);
+                        break;
+                        
+                    case 'king':
+                        for (let r = -1; r <= 1; r++) {
+                            for (let c = -1; c <= 1; c++) {
+                                if (r === 0 && c === 0) continue;
+                                
+                                const newRow = row + r;
+                                const newCol = col + c;
+                                
+                                if (isInBoard(newRow, newCol) && 
+                                    (!board[newRow][newCol] || board[newRow][newCol].color !== piece.color)) {
+                                    validMoves.push({ row: newRow, col: newCol });
+                                }
+                            }
+                        }
+                        // Adiciona movimentos de roque
+                        addCastlingMoves(row, col, piece);
+                        break;
+                }
+            }
+            
+            // Adiciona movimentos de roque
+            function addCastlingMoves(row, col, piece) {
+                const color = piece.color;
+                
+                // Verifica se o rei já se moveu
+                if (!castlingRights[color].kingSide && !castlingRights[color].queenSide) {
+                    return;
+                }
+                
+                // Verifica roque pequeno (lado do rei)
+                if (castlingRights[color].kingSide) {
+                    const kingSideRookCol = color === 'white' ? 7 : 7;
+                    const kingSideEmpty = color === 'white' ? 
+                        !board[7][5] && !board[7][6] : 
+                        !board[0][5] && !board[0][6];
+                    
+                    if (kingSideEmpty && board[row][kingSideRookCol]?.type === 'rook' && 
+                        board[row][kingSideRookCol]?.color === color) {
+                        validMoves.push({
+                            row: row,
+                            col: col + 2,
+                            castling: true,
+                            rookFrom: { row: row, col: kingSideRookCol },
+                            rookTo: { row: row, col: col + 1 },
+                            type: 'kingSide'
+                        });
+                    }
+                }
+                
+                // Verifica roque grande (lado da rainha)
+                if (castlingRights[color].queenSide) {
+                    const queenSideRookCol = color === 'white' ? 0 : 0;
+                    const queenSideEmpty = color === 'white' ? 
+                        !board[7][1] && !board[7][2] && !board[7][3] : 
+                        !board[0][1] && !board[0][2] && !board[0][3];
+                    
+                    if (queenSideEmpty && board[row][queenSideRookCol]?.type === 'rook' && 
+                        board[row][queenSideRookCol]?.color === color) {
+                        validMoves.push({
+                            row: row,
+                            col: col - 2,
+                            castling: true,
+                            rookFrom: { row: row, col: queenSideRookCol },
+                            rookTo: { row: row, col: col - 1 },
+                            type: 'queenSide'
+                        });
+                    }
+                }
+            }
+            
+            // Adiciona movimentos em linha reta (horizontal/vertical)
+            function addStraightMoves(row, col, piece) {
+                const directions = [
+                    {r: -1, c: 0}, {r: 1, c: 0}, // Vertical
+                    {r: 0, c: -1}, {r: 0, c: 1}  // Horizontal
+                ];
+                
+                for (let dir of directions) {
+                    for (let i = 1; i < 8; i++) {
+                        const newRow = row + dir.r * i;
+                        const newCol = col + dir.c * i;
+                        
+                        if (!isInBoard(newRow, newCol)) break;
+                        
+                        if (!board[newRow][newCol]) {
+                            validMoves.push({ row: newRow, col: newCol });
+                        } else {
+                            if (board[newRow][newCol].color !== piece.color) {
+                                validMoves.push({ row: newRow, col: newCol });
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Adiciona movimentos diagonais
+            function addDiagonalMoves(row, col, piece) {
+                const directions = [
+                    {r: -1, c: -1}, {r: -1, c: 1},
+                    {r: 1, c: -1}, {r: 1, c: 1}
+                ];
+                
+                for (let dir of directions) {
+                    for (let i = 1; i < 8; i++) {
+                        const newRow = row + dir.r * i;
+                        const newCol = col + dir.c * i;
+                        
+                        if (!isInBoard(newRow, newCol)) break;
+                        
+                        if (!board[newRow][newCol]) {
+                            validMoves.push({ row: newRow, col: newCol });
+                        } else {
+                            if (board[newRow][newCol].color !== piece.color) {
+                                validMoves.push({ row: newRow, col: newCol });
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Verifica se a posição está dentro do tabuleiro
+            function isInBoard(row, col) {
+                return row >= 0 && row < 8 && col >= 0 && col < 8;
+            }
+            
+            // Destaca os movimentos válidos
+            function highlightValidMoves() {
+                validMoves.forEach(move => {
+                    const square = document.querySelector(`.square[data-row="${move.row}"][data-col="${move.col}"]`);
+                    if (square) {
+                        if (move.castling) {
+                            square.classList.add('castling-move');
+                        } else {
+                            square.classList.add('valid-move');
+                        }
+                    }
+                });
+            }
+            
+            // Move uma peça
+            function movePiece(fromRow, fromCol, toRow, toCol) {
+                const piece = board[fromRow][fromCol];
+                const capturedPiece = board[toRow][toCol];
+                
+                // Verifica se é um movimento de roque
+                const castlingMove = validMoves.find(move => 
+                    move.row === toRow && move.col === toCol && move.castling
+                );
+                
+                if (castlingMove) {
+                    // Executa o roque
+                    const rook = board[castlingMove.rookFrom.row][castlingMove.rookFrom.col];
+                    
+                    // Move o rei
+                    board[toRow][toCol] = piece;
+                    board[fromRow][fromCol] = null;
+                    
+                    // Move a torre
+                    board[castlingMove.rookTo.row][castlingMove.rookTo.col] = rook;
+                    board[castlingMove.rookFrom.row][castlingMove.rookFrom.col] = null;
+                    
+                    // Atualiza direitos de roque
+                    castlingRights[piece.color].kingSide = false;
+                    castlingRights[piece.color].queenSide = false;
+                    
+                    // Registrar o movimento no histórico
+                    const moveNotation = castlingMove.type === 'kingSide' ? 'O-O' : 'O-O-O';
+                    moveHistory.push({
+                        piece,
+                        from: { row: fromRow, col: fromCol },
+                        to: { row: toRow, col: toCol },
+                        captured: null,
+                        notation: moveNotation,
+                        castling: true
+                    });
+                } else {
+                    // Movimento normal
+                    
+                    // Registrar o movimento no histórico
+                    const moveNotation = getMoveNotation(piece, fromRow, fromCol, toRow, toCol, capturedPiece);
+                    moveHistory.push({
+                        piece,
+                        from: { row: fromRow, col: fromCol },
+                        to: { row: toRow, col: toCol },
+                        captured: capturedPiece,
+                        notation: moveNotation
+                    });
+                    
+                    // Executar o movimento
+                    board[toRow][toCol] = piece;
+                    board[fromRow][fromCol] = null;
+                    
+                    // Atualizar direitos de roque se o rei ou uma torre se mover
+                    if (piece.type === 'king') {
+                        castlingRights[piece.color].kingSide = false;
+                        castlingRights[piece.color].queenSide = false;
+                    } else if (piece.type === 'rook') {
+                        if (piece.color === 'white') {
+                            if (fromCol === 0) castlingRights.white.queenSide = false;
+                            if (fromCol === 7) castlingRights.white.kingSide = false;
+                        } else {
+                            if (fromCol === 0) castlingRights.black.queenSide = false;
+                            if (fromCol === 7) castlingRights.black.kingSide = false;
+                        }
+                    }
+                }
+                
+                // Verificar se é xeque-mate (simulação)
+                const isCheckmate = Math.random() < 0.1; // 10% de chance de simular xeque-mate
+                
+                if (isCheckmate) {
+                    gameActive = false;
+                    gameStatus.textContent = `Xeque-mate! Vitória das ${currentPlayer === 'white' ? 'brancas' : 'pretas'}`;
+                }
+                
+                // Alternar jogador
+                currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+                
+                // Atualizar a interface
+                renderBoard();
+                renderMoveHistory();
+                updateStatus();
+            }
+            
+            // Obtém a notação do movimento
+            function getMoveNotation(piece, fromRow, fromCol, toRow, toCol, captured) {
+                const pieceSymbol = piece.type === 'knight' ? 'C' : 
+                                  piece.type === 'bishop' ? 'B' : 
+                                  piece.type === 'rook' ? 'T' : 
+                                  piece.type === 'queen' ? 'D' : 
+                                  piece.type === 'king' ? 'R' : '';
+                
+                const file = String.fromCharCode(97 + fromCol);
+                const rank = 8 - fromRow;
+                const toFile = String.fromCharCode(97 + toCol);
+                const toRank = 8 - toRow;
+                
+                let notation = '';
+                
+                if (piece.type !== 'pawn') {
+                    notation += pieceSymbol;
+                }
+                
+                if (captured) {
+                    if (piece.type === 'pawn') {
+                        notation += file + 'x';
+                    } else {
+                        notation += 'x';
+                    }
+                }
+                
+                notation += toFile + toRank;
+                
+                return notation;
+            }
+            
+            // Atualiza o histórico de movimentos
+            function renderMoveHistory() {
+                movesContainer.innerHTML = '';
+                
+                for (let i = 0; i < moveHistory.length; i += 2) {
+                    const moveDiv = document.createElement('div');
+                    moveDiv.classList.add('move');
+                    
+                    // Movimento das brancas
+                    moveDiv.textContent = `${Math.floor(i/2) + 1}. ${moveHistory[i].notation}`;
+                    
+                    // Movimento das pretas, se existir
+                    if (i + 1 < moveHistory.length) {
+                        moveDiv.textContent += ` ${moveHistory[i+1].notation}`;
+                    }
+                    
+                    movesContainer.appendChild(moveDiv);
+                }
+                
+                // Rolagem automática para o final
+                movesContainer.scrollTop = movesContainer.scrollHeight;
+            }
+            
+            // Atualiza o status do jogo
+            function updateStatus() {
+                turnIndicator.textContent = currentPlayer === 'white' ? '♔' : '♚';
+                turnText.textContent = currentPlayer === 'white' ? 'Brancas' : 'Pretas';
+                
+                // Simular xeque ocasionalmente
+                const inCheck = Math.random() < 0.2; // 20% de chance de simular xeque
+                checkIndicator.textContent = inCheck ? 'XEQUE!' : '';
+                checkIndicator.style.color = inCheck ? '#ff5555' : '';
+            }
+            
+            // Novo jogo
+            newGameBtn.addEventListener('click', () => {
+                selectedPiece = null;
+                validMoves = [];
+                currentPlayer = 'white';
+                moveHistory = [];
+                gameActive = true;
+                setupPieces();
+                renderBoard();
+                renderMoveHistory();
+                updateStatus();
+                gameStatus.textContent = 'Em andamento';
+            });
+            
+            // Desfazer jogada
+            undoBtn.addEventListener('click', () => {
+                if (moveHistory.length === 0) return;
+                
+                const lastMove = moveHistory.pop();
+                
+                if (lastMove.castling) {
+                    // Desfazer roque
+                    board[lastMove.from.row][lastMove.from.col] = lastMove.piece;
+                    board[lastMove.to.row][lastMove.to.col] = null;
+                    
+                    // Voltar a torre para sua posição original
+                    const rookFromCol = lastMove.notation === 'O-O' ? 7 : 0;
+                    const rookToCol = lastMove.notation === 'O-O' ? lastMove.to.col - 1 : lastMove.to.col + 1;
+                    
+                    board[lastMove.to.row][rookFromCol] = { type: 'rook', color: lastMove.piece.color };
+                    board[lastMove.to.row][rookToCol] = null;
+                    
+                    // Restaurar direitos de roque
+                    castlingRights[lastMove.piece.color] = {
+                        kingSide: true,
+                        queenSide: true
+                    };
+                } else {
+                    // Desfazer movimento normal
+                    board[lastMove.from.row][lastMove.from.col] = lastMove.piece;
+                    board[lastMove.to.row][lastMove.to.col] = lastMove.captured;
+                    
+                    // Restaurar direitos de roque se necessário
+                    if (lastMove.piece.type === 'king') {
+                        castlingRights[lastMove.piece.color] = {
+                            kingSide: true,
+                            queenSide: true
+                        };
+                    } else if (lastMove.piece.type === 'rook') {
+                        if (lastMove.piece.color === 'white') {
+                            if (lastMove.from.col === 0) castlingRights.white.queenSide = true;
+                            if (lastMove.from.col === 7) castlingRights.white.kingSide = true;
+                        } else {
+                            if (lastMove.from.col === 0) castlingRights.black.queenSide = true;
+                            if (lastMove.from.col === 7) castlingRights.black.kingSide = true;
+                        }
+                    }
+                }
+                
+                // Se havia dois movimentos (brancas e pretas), remover o anterior também
+                if (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].piece.color !== lastMove.piece.color) {
+                    const secondLastMove = moveHistory.pop();
+                    board[secondLastMove.from.row][secondLastMove.from.col] = secondLastMove.piece;
+                    board[secondLastMove.to.row][secondLastMove.to.col] = secondLastMove.captured;
+                    
+                    // Restaurar direitos de roque se necessário
+                    if (secondLastMove.piece.type === 'king') {
+                        castlingRights[secondLastMove.piece.color] = {
+                            kingSide: true,
+                            queenSide: true
+                        };
+                    } else if (secondLastMove.piece.type === 'rook') {
+                        if (secondLastMove.piece.color === 'white') {
+                            if (secondLastMove.from.col === 0) castlingRights.white.queenSide = true;
+                            if (secondLastMove.from.col === 7) castlingRights.white.kingSide = true;
+                        } else {
+                            if (secondLastMove.from.col === 0) castlingRights.black.queenSide = true;
+                            if (secondLastMove.from.col === 7) castlingRights.black.kingSide = true;
+                        }
+                    }
+                }
+                
+                currentPlayer = 'white';
+                gameActive = true;
+                renderBoard();
+                renderMoveHistory();
+                updateStatus();
+                gameStatus.textContent = 'Em andamento';
+            });
+            
+            // Girar tabuleiro
+            flipBoardBtn.addEventListener('click', () => {
+                boardFlipped = !boardFlipped;
+                chessBoard.style.transform = boardFlipped ? 'rotate(180deg)' : 'rotate(0deg)';
+                
+                // Atualiza a posição das peças para a nova orientação
+                setTimeout(renderBoard, 10);
+            });
+            
+            // Iniciar o jogo
+            initGame();
+        });
+    </script>
+</body>
+</html>
