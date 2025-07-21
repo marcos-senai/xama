@@ -1,125 +1,80 @@
-const express = require("express");
-const http = require("http");
-const socketIo = require("socket.io");
-const cors = require("cors");
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const cors = require('cors');
 
 const app = express();
 app.use(cors());
 const server = http.createServer(app);
-const io = socketIo(server, {
+const io = new Server(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"],
-  },
+    methods: ["GET", "POST"]
+  }
 });
 
-// Armazenamento em memória (substituir por DB em produção)
+// Armazenamento de salas
 const rooms = {};
-const players = {};
 
-io.on("connection", (socket) => {
-  console.log(`Novo cliente conectado: ${socket.id}`);
+io.on('connection', (socket) => {
+  console.log(`Usuário conectado: ${socket.id}`);
 
-  // Criar sala
-  socket.on("create-room", (username) => {
-    const roomId = generateRoomId();
+  // Criar uma nova sala
+  socket.on('createRoom', (username) => {
+    const roomId = Math.random().toString(36).substring(2, 7).toUpperCase();
     rooms[roomId] = {
-      players: [
-        {
-          id: socket.id,
-          username,
-          color: "white",
-        },
-      ],
-      board: null,
-      status: "waiting",
+      players: [{ id: socket.id, username, color: 'white' }],
+      board: null
     };
-
     socket.join(roomId);
-    players[socket.id] = { roomId, username };
-    socket.emit("room-created", roomId);
+    socket.emit('roomCreated', roomId);
+    console.log(`Sala criada: ${roomId}`);
   });
 
-  // Entrar em sala
-  socket.on("join-room", (roomId, username) => {
+  // Entrar em uma sala existente
+  socket.on('joinRoom', (roomId, username) => {
     if (rooms[roomId] && rooms[roomId].players.length < 2) {
-      rooms[roomId].players.push({
-        id: socket.id,
-        username,
-        color: "black",
-      });
-
-      rooms[roomId].status = "playing";
+      const color = rooms[roomId].players[0].color === 'white' ? 'black' : 'white';
+      rooms[roomId].players.push({ id: socket.id, username, color });
       socket.join(roomId);
-      players[socket.id] = { roomId, username };
-
-      // Iniciar jogo
-      io.to(roomId).emit("game-started", {
-        players: rooms[roomId].players,
-        board: initializeBoard(),
-      });
+      
+      // Notificar ambos os jogadores
+      io.to(roomId).emit('playerJoined', rooms[roomId].players);
+      
+      // Se a sala está cheia, iniciar o jogo
+      if (rooms[roomId].players.length === 2) {
+        io.to(roomId).emit('gameStart', color);
+      }
     } else {
-      socket.emit("join-error", "Sala cheia ou inexistente");
+      socket.emit('roomError', 'Sala cheia ou inexistente');
     }
   });
 
   // Movimento de peça
-  socket.on("move-piece", (moveData) => {
-    const playerData = players[socket.id];
-    if (!playerData) return;
-
-    const roomId = playerData.roomId;
-    const room = rooms[roomId];
-
-    // Validar movimento e atualizar tabuleiro
-    if (validateMove(room.board, moveData)) {
-      room.board = applyMove(room.board, moveData);
-
-      // Atualizar todos os jogadores
-      io.to(roomId).emit("board-update", room.board);
-      io.to(roomId).emit(
-        "turn-changed",
-        getOppositeColor(moveData.playerColor)
-      );
-
-      // Verificar xeque-mate
-      if (isCheckmate(room.board, getOppositeColor(moveData.playerColor))) {
-        io.to(roomId).emit("game-ended", `Vitória das ${moveData.playerColor}`);
-      }
+  socket.on('move', (roomId, moveData) => {
+    if (rooms[roomId]) {
+      // Atualizar estado do tabuleiro
+      rooms[roomId].board = moveData.board;
+      
+      // Enviar movimento para o outro jogador
+      socket.to(roomId).emit('opponentMove', moveData);
     }
   });
 
   // Desconexão
-  socket.on("disconnect", () => {
-    console.log(`Cliente desconectado: ${socket.id}`);
-    const playerData = players[socket.id];
-    if (playerData) {
-      const roomId = playerData.roomId;
-      delete players[socket.id];
-
-      if (rooms[roomId]) {
-        io.to(roomId).emit("player-left", playerData.username);
+  socket.on('disconnect', () => {
+    console.log(`Usuário desconectado: ${socket.id}`);
+    // Limpar salas vazias
+    Object.keys(rooms).forEach(roomId => {
+      rooms[roomId].players = rooms[roomId].players.filter(p => p.id !== socket.id);
+      if (rooms[roomId].players.length === 0) {
         delete rooms[roomId];
       }
-    }
+    });
   });
 });
 
-// Funções auxiliares
-function generateRoomId() {
-  return Math.random().toString(36).substring(2, 8).toUpperCase();
-}
-
-function initializeBoard() {
-  // Implementar lógica de inicialização do tabuleiro
-  // (Similar ao seu setupPieces() atual)
-}
-
-function validateMove(board, move) {
-  // Implementar lógica de validação
-  // (Similar ao seu calculateValidMoves() atual)
-}
-
-server.listen(3001, () => {
-  console.log("Servidor rodando na porta 3001");
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xadrez - Projeto Completo</title>
+    <title>Xadrez Premium - Multiplayer</title>
     <style>
         * {
             margin: 0;
@@ -270,12 +270,161 @@
                 font-size: 30px;
             }
         }
+        
+        /* ESTILOS MULTIPLAYER */
+        #multiplayer-setup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .multiplayer-box {
+            background: #2c3e50;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .multiplayer-box h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .multiplayer-input {
+            margin: 15px 0;
+        }
+
+        .multiplayer-input input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 50px;
+            border: none;
+            background: #34495e;
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .multiplayer-btn {
+            background: linear-gradient(145deg, #ffd700, #ff9800);
+            color: #1a1a1a;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .multiplayer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(145deg, #ffff00, #ffb300);
+        }
+
+        .multiplayer-btn.secondary {
+            background: #3498db;
+            color: white;
+        }
+
+        .multiplayer-btn.secondary:hover {
+            background: #2980b9;
+        }
+
+        #room-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+
+        .player-status {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .player-name {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .player-ready {
+            color: #2ecc71;
+        }
+
+        .player-waiting {
+            color: #e74c3c;
+        }
+        
+        .timers {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+    <!-- Interface Multiplayer -->
+    <div id="multiplayer-setup">
+        <div class="multiplayer-box">
+            <h2>Modo Multiplayer</h2>
+            
+            <div id="create-section">
+                <button id="create-room" class="multiplayer-btn">Criar Nova Sala</button>
+                <div style="margin: 20px 0; font-size: 1.2rem;">OU</div>
+            </div>
+            
+            <div id="join-section">
+                <div class="multiplayer-input">
+                    <input type="text" id="room-id" placeholder="Digite o ID da sala">
+                </div>
+                <button id="join-room" class="multiplayer-btn secondary">Entrar na Sala</button>
+            </div>
+            
+            <div id="room-info">Escolha uma opção para começar</div>
+            
+            <div id="players-container" style="display: none;">
+                <h3>Jogadores na Sala</h3>
+                <div id="players-list"></div>
+            </div>
+            
+            <button id="start-game-btn" class="multiplayer-btn" style="display: none; margin-top: 20px;">Iniciar Jogo</button>
+            <button id="leave-room-btn" class="multiplayer-btn secondary" style="display: none;">Sair da Sala</button>
+        </div>
+    </div>
+
     <header>
-        <h1>♚ Jogo de Xadrez Completo ♔</h1>
-        <p>Com movimentos especiais de roque implementados</p>
+        <h1>♚ Jogo de Xadrez Multiplayer ♔</h1>
+        <p>Jogue contra amigos em tempo real</p>
     </header>
     
     <div class="container">
@@ -307,34 +456,30 @@
     </div>
     
     <div class="instructions">
-        <h2>Como Jogar</h2>
+        <h2>Como Jogar - Multiplayer</h2>
         <ul>
-            <li><strong>Brancas começam:</strong> As peças brancas fazem o primeiro movimento</li>
-            <li><strong>Seleção:</strong> Clique em uma peça para selecioná-la (destacada em verde)</li>
-            <li><strong>Movimento:</strong> Clique em uma casa marcada para mover a peça</li>
-            <li><strong>Peças:</strong> Rei (♔, ♚), Rainha (♕, ♛), Torre (♖, ♜), Bispo (♗, ♝), Cavalo (♘, ♞), Peão (♙, ♟)</li>
-            <li><strong>Xeque:</strong> Quando o rei está sob ataque, você deve protegê-lo no próximo movimento</li>
-            <li><strong>Xeque-mate:</strong> Quando o rei está sob ataque e não pode escapar - fim do jogo</li>
+            <li><strong>Crie ou entre em uma sala</strong> para jogar contra um amigo</li>
+            <li><strong>O jogador com as peças brancas começa</strong></li>
+            <li><strong>Seu turno será destacado</strong> na interface</li>
+            <li><strong>Os movimentos são sincronizados</strong> em tempo real</li>
+            <li><strong>Histórico de jogadas</strong> é compartilhado entre os jogadores</li>
         </ul>
         
         <div class="special-moves">
-            <h3>Movimentos Especiais</h3>
+            <h3>Dicas para Multiplayer</h3>
             <ul>
-                <li><strong>Roque (Castling):</strong> Movimento especial envolvendo o rei e uma torre</li>
-                <li><strong>Roque Pequeno (O-O):</strong> Rei move-se duas casas em direção à torre do lado do rei, e a torre salta para a casa ao lado do rei</li>
-                <li><strong>Roque Grande (O-O-O):</strong> Rei move-se duas casas em direção à torre do lado da rainha, e a torre salta para a casa ao lado do rei</li>
-                <li><strong>Condições:</strong> Nem o rei nem a torre podem ter se movido anteriormente, não pode haver peças entre eles, e o rei não pode estar em xeque</li>
+                <li>Comunique-se com seu oponente usando o chat (em breve)</li>
+                <li>Respeite o tempo de reflexão do adversário</li>
+                <li>O botão "Desfazer" só funciona em modo local</li>
             </ul>
         </div>
     </div>
+    
     <div class="timers">
         <div>Brancas: <span id="white-timer">10:00</span></div>
         <div>Pretas: <span id="black-timer">10:00</span></div>
-      </div>
- <div class="timers">
-        <div id="white-timer">10:00</div>
-        <div id="black-timer">10:00</div>
-    </div>></div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Elementos do DOM
@@ -465,6 +610,11 @@
             // Manipula o clique em uma casa
             function handleSquareClick(event) {
                 if (!gameActive) return;
+                
+                // Verificar se é o turno do jogador
+                if (playerColor && currentPlayer !== playerColor) {
+                    return;
+                }
                 
                 const square = event.currentTarget;
                 const row = parseInt(square.dataset.row);
@@ -793,6 +943,18 @@
                 renderBoard();
                 renderMoveHistory();
                 updateStatus();
+                
+                // Se estiver no modo multiplayer, enviar movimento para o servidor
+                if (socket && roomId && playerColor) {
+                    socket.emit('move', {
+                        roomId,
+                        fromRow,
+                        fromCol,
+                        toRow,
+                        toCol,
+                        playerId
+                    });
+                }
             }
             
             // Obtém a notação do movimento
@@ -859,7 +1021,19 @@
                 const inCheck = Math.random() < 0.2; // 20% de chance de simular xeque
                 checkIndicator.textContent = inCheck ? 'XEQUE!' : '';
                 checkIndicator.style.color = inCheck ? '#ff5555' : '';
+                
+                // Destacar turno do jogador no multiplayer
+                if (playerColor) {
+                    if (currentPlayer === playerColor) {
+                        turnText.style.color = '#ffd700';
+                        turnText.style.fontWeight = 'bold';
+                    } else {
+                        turnText.style.color = 'white';
+                        turnText.style.fontWeight = 'normal';
+                    }
+                }
             }
+
             
             // Novo jogo
             newGameBtn.addEventListener('click', () => {
@@ -873,6 +1047,11 @@
                 renderMoveHistory();
                 updateStatus();
                 gameStatus.textContent = 'Em andamento';
+                
+                // Se estiver em modo multiplayer, notificar reinício
+                if (socket && roomId) {
+                    socket.emit('newGame', roomId);
+                }
             });
             
             // Desfazer jogada
@@ -960,11 +1139,175 @@
                 setTimeout(renderBoard, 10);
             });
             
-            // Iniciar o jogo
-            initGame();
+            // =================================================================
+            // MULTIPLAYER
+            // =================================================================
+            
+            // Elementos do multiplayer
+            const multiplayerSetup = document.getElementById('multiplayer-setup');
+            const createRoomBtn = document.getElementById('create-room');
+            const joinRoomBtn = document.getElementById('join-room');
+            const roomIdInput = document.getElementById('room-id');
+            const roomInfo = document.getElementById('room-info');
+            const playersContainer = document.getElementById('players-container');
+            const playersList = document.getElementById('players-list');
+            const startGameBtn = document.getElementById('start-game-btn');
+            const leaveRoomBtn = document.getElementById('leave-room-btn');
+            
+            // Estado do multiplayer
+            let socket = null;
+            let roomId = null;
+            let playerId = null;
+            let playerColor = null;
+            let players = {};
+            let isRoomOwner = false;
+            
+            // Obter nome de usuário do localStorage
+            const username = localStorage.getItem('chessUsername') || 'Jogador';
+            
+            // Conectar ao servidor WebSocket
+            function connectToServer() {
+                // Altere a URL para o seu servidor WebSocket
+                socket = io('http://localhost:3001');
+                
+                socket.on('connect', () => {
+                    playerId = socket.id;
+                    roomInfo.textContent = 'Conectado ao servidor. Escolha uma opção.';
+                });
+                
+                socket.on('roomCreated', (id) => {
+                    roomId = id;
+                    roomInfo.innerHTML = `Sala criada! ID: <strong>${id}</strong><br>Compartilhe este código com seu amigo.`;
+                    isRoomOwner = true;
+                    playersContainer.style.display = 'block';
+                    startGameBtn.style.display = 'block';
+                    leaveRoomBtn.style.display = 'block';
+                    
+                    // Adicionar o dono da sala à lista de jogadores
+                    players[playerId] = { id: playerId, username: username, color: null };
+                    updatePlayerList();
+                });
+                
+                socket.on('playerJoined', (player) => {
+                    players[player.id] = player;
+                    updatePlayerList();
+                    
+                    if (isRoomOwner) {
+                        startGameBtn.disabled = Object.keys(players).length < 2;
+                    }
+                });
+                
+                socket.on('playerLeft', (playerId) => {
+                    delete players[playerId];
+                    updatePlayerList();
+                    
+                    if (isRoomOwner) {
+                        startGameBtn.disabled = Object.keys(players).length < 2;
+                    }
+                });
+                
+                socket.on('gameStart', (colors) => {
+                    playerColor = colors[socket.id];
+                    multiplayerSetup.style.display = 'none';
+                    
+                    // Iniciar o jogo
+                    initGame();
+                    gameStatus.textContent = `Jogando contra ${Object.values(players).find(p => p.id !== socket.id)?.username || 'oponente'}`;
+                    
+                    // Destacar o turno do jogador
+                    updateStatus();
+                });
+                
+                socket.on('move', (moveData) => {
+                    // Se o movimento não foi feito por este jogador
+                    if (moveData.playerId !== playerId) {
+                        // Executar o movimento
+                        movePiece(moveData.fromRow, moveData.fromCol, moveData.toRow, moveData.toCol);
+                    }
+                });
+                
+                socket.on('newGame', () => {
+                    // Reiniciar o jogo quando o oponente iniciar um novo jogo
+                    selectedPiece = null;
+                    validMoves = [];
+                    currentPlayer = 'white';
+                    moveHistory = [];
+                    gameActive = true;
+                    setupPieces();
+                    renderBoard();
+                    renderMoveHistory();
+                    updateStatus();
+                    gameStatus.textContent = 'Em andamento';
+                });
+                
+                socket.on('roomError', (message) => {
+                    roomInfo.textContent = `Erro: ${message}`;
+                });
+            }
+            
+            // Atualizar lista de jogadores
+            function updatePlayerList() {
+                playersList.innerHTML = '';
+                
+                Object.values(players).forEach(player => {
+                    const playerDiv = document.createElement('div');
+                    playerDiv.className = 'player-status';
+                    
+                    playerDiv.innerHTML = `
+                        <span class="player-name">${player.username}</span>
+                        <span class="${player.color ? 'player-ready' : 'player-waiting'}">
+                            ${player.color ? 'Pronto' : 'Aguardando'}
+                        </span>
+                    `;
+                    
+                    playersList.appendChild(playerDiv);
+                });
+            }
+            
+            // Criar sala
+            createRoomBtn.addEventListener('click', () => {
+                socket.emit('createRoom', username);
+                roomInfo.textContent = 'Criando sala...';
+            });
+            
+            // Entrar em sala
+            joinRoomBtn.addEventListener('click', () => {
+                const roomId = roomIdInput.value.trim();
+                if (roomId) {
+                    socket.emit('joinRoom', roomId, username);
+                    roomInfo.textContent = 'Entrando na sala...';
+                } else {
+                    roomInfo.textContent = 'Por favor, digite o ID da sala';
+                }
+            });
+            
+            // Iniciar jogo
+            startGameBtn.addEventListener('click', () => {
+                socket.emit('startGame', roomId);
+            });
+            
+            // Sair da sala
+            leaveRoomBtn.addEventListener('click', () => {
+                socket.emit('leaveRoom', roomId);
+                multiplayerSetup.style.display = 'flex';
+                playersContainer.style.display = 'none';
+                startGameBtn.style.display = 'none';
+                leaveRoomBtn.style.display = 'none';
+                roomInfo.textContent = 'Escolha uma opção para começar';
+                isRoomOwner = false;
+                players = {};
+                playerColor = null;
+                
+                // Reiniciar para modo single player
+                initGame();
+            });
+            
+            // Conectar ao servidor quando a página carregar
+            connectToServer();
         });
-        <!-- Vincular JS/CSS -->
-</script>script src="jogo.js"></script><!-- Adicionar antes do fechamento do body -->
-<script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    </script>
+    
+    <!-- Biblioteca Socket.io -->
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
 </body>
 </html>
