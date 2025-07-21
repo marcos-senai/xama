@@ -1,227 +1,831 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Xadrez Premium</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xadrez Premium - Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-      body {
-        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        overflow-x: hidden;
-      }
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      overflow-x: hidden;
+    }
 
-      .container {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        max-width: 1200px;
-        height: 100vh;
-        padding: 20px;
-      }
+    .container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 1200px;
+      height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
 
-      .welcome-screen {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        height: 100%;
-        padding: 20px;
-        animation: fadeIn 1.5s ease-out;
-      }
+    /* Tela de boas-vindas */
+    .welcome-screen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 100%;
+      padding: 20px;
+      animation: fadeIn 1.5s ease-out;
+    }
 
+    .logo {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+      animation: pulse 2s infinite;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin-bottom: 15px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(to right, #ffd700, #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 40px;
+      max-width: 700px;
+      line-height: 1.6;
+    }
+
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      margin: 40px 0;
+      max-width: 900px;
+    }
+
+    .feature-card {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 15px;
+      padding: 25px;
+      width: 250px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #ffd700;
+    }
+
+    .feature-title {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: #ffd700;
+    }
+
+    .start-button {
+      background: linear-gradient(145deg, #ffd700, #ff9800);
+      color: #1a1a1a;
+      border: none;
+      padding: 18px 45px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      margin-top: 20px;
+    }
+
+    .start-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(145deg, #ffff00, #ffb300);
+    }
+
+    .start-button:active {
+      transform: scale(0.98);
+    }
+
+    /* Tela de login */
+    .login-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      z-index: 10;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s ease;
+    }
+
+    .login-screen.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .login-form {
+      background: rgba(26, 42, 108, 0.8);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      transform: translateY(20px);
+      transition: transform 0.5s ease;
+    }
+
+    .login-screen.active .login-form {
+      transform: translateY(0);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-header i {
+      font-size: 3rem;
+      color: #ffd700;
+      margin-bottom: 15px;
+    }
+
+    .login-header h2 {
+      font-size: 2.5rem;
+      background: linear-gradient(to right, #ffd700, #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .input-group {
+      margin-bottom: 25px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #ffd700;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 15px 20px;
+      border-radius: 50px;
+      border: none;
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 1.1rem;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #ffd700;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    }
+
+    .login-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      font-size: 0.95rem;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+    }
+
+    .remember-me input {
+      margin-right: 8px;
+    }
+
+    .forgot-password {
+      color: #ffd700;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .forgot-password:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .login-button {
+      background: linear-gradient(145deg, #ffd700, #ff9800);
+      color: #1a1a1a;
+      border: none;
+      width: 100%;
+      padding: 16px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-button:hover {
+      transform: scale(1.02);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 1rem;
+    }
+
+    .login-footer a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .login-footer a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .close-login {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .close-login:hover {
+      background: rgba(255, 215, 0, 0.3);
+      transform: rotate(90deg);
+    }
+
+    /* Tela de jogo (simulação) */
+    .game-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 20;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s ease;
+    }
+
+    .game-screen.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .game-container {
+      background: rgba(26, 42, 108, 0.9);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7);
+      border: 3px solid rgba(255, 215, 0, 0.4);
+      text-align: center;
+    }
+
+    .game-header {
+      margin-bottom: 25px;
+    }
+
+    .game-header h2 {
+      font-size: 2.8rem;
+      background: linear-gradient(to right, #ffd700, #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+    }
+
+    .chess-board {
+      display: inline-block;
+      border: 8px solid #5d3700;
+      border-radius: 4px;
+      margin: 20px 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .board-row {
+      display: flex;
+    }
+
+    .board-square {
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+    }
+
+    .white {
+      background-color: #f0d9b5;
+    }
+
+    .black {
+      background-color: #b58863;
+    }
+
+    .game-info {
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+
+    .player-info {
+      display: flex;
+      justify-content: space-around;
+      margin: 15px 0;
+      font-size: 1.2rem;
+    }
+
+    .player {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .player-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .player-white .player-icon {
+      background: #f0d9b5;
+      color: #000;
+    }
+
+    .player-black .player-icon {
+      background: #b58863;
+      color: #fff;
+    }
+
+    .back-to-menu {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffd700;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 20px;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .back-to-menu:hover {
+      background: rgba(255, 215, 0, 0.2);
+      transform: translateY(-3px);
+    }
+
+    /* Animações */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+      20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
       .logo {
-        font-size: 5rem;
-        margin-bottom: 20px;
-        text-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
-        animation: pulse 2s infinite;
+        font-size: 3.5rem;
       }
 
       h1 {
-        font-size: 3.5rem;
-        margin-bottom: 15px;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        background: linear-gradient(to right, #ffd700, #ffffff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-size: 2.5rem;
       }
 
       .subtitle {
-        font-size: 1.5rem;
-        margin-bottom: 40px;
-        max-width: 700px;
-        line-height: 1.6;
+        font-size: 1.2rem;
       }
 
       .features {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 30px;
-        margin: 40px 0;
-        max-width: 900px;
+        gap: 15px;
       }
 
       .feature-card {
-        background: rgba(0, 0, 0, 0.4);
-        border-radius: 15px;
-        padding: 25px;
-        width: 250px;
-        text-align: center;
-        transition: transform 0.3s, box-shadow 0.3s;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        max-width: 300px;
       }
 
-      .feature-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-        background: rgba(0, 0, 0, 0.5);
+      .login-form {
+        padding: 30px 20px;
       }
 
-      .feature-icon {
-        font-size: 3rem;
-        margin-bottom: 15px;
-        color: #ffd700;
+      .login-header h2 {
+        font-size: 2rem;
       }
 
-      .feature-title {
-        font-size: 1.4rem;
-        margin-bottom: 10px;
-        color: #ffd700;
+      .board-square {
+        width: 40px;
+        height: 40px;
+        font-size: 1.8rem;
       }
 
-      .start-button {
-        background: linear-gradient(145deg, #ffd700, #ff9800);
-        color: #1a1a1a;
-        border: none;
-        padding: 18px 45px;
-        font-size: 1.4rem;
-        font-weight: bold;
-        border-radius: 50px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        margin-top: 20px;
+      .player-info {
+        flex-direction: column;
+        gap: 15px;
       }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Tela inicial -->
+    <div class="welcome-screen" id="welcomeScreen">
+      <div class="logo">♚♔</div>
+      <h1>Xadrez Premium</h1>
+      <p class="subtitle">
+        Desafie sua mente com o mais nobre dos jogos. Estrategize, mova e
+        conquiste o tabuleiro neste clássico jogo de tática e habilidade.
+      </p>
 
-      .start-button:hover {
-        transform: scale(1.05);
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
-        background: linear-gradient(145deg, #ffff00, #ffb300);
-      }
-
-      .start-button:active {
-        transform: scale(0.98);
-      }
-
-      /* Animações */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(50px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes pulse {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-
-      /* Responsividade */
-      @media (max-width: 768px) {
-        .logo {
-          font-size: 3.5rem;
-        }
-
-        h1 {
-          font-size: 2.5rem;
-        }
-
-        .subtitle {
-          font-size: 1.2rem;
-        }
-
-        .features {
-          gap: 15px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <!-- Tela inicial -->
-      <div class="welcome-screen" id="welcomeScreen">
-        <div class="logo">♚♔</div>
-        <h1>Xadrez Premium</h1>
-        <p class="subtitle">
-          Desafie sua mente com o mais nobre dos jogos. Estrategize, mova e
-          conquiste o tabuleiro neste clássico jogo de tática e habilidade.
-        </p>
-
-        <div class="features">
-          <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-chess-king"></i></div>
-            <h3 class="feature-title">Jogo Completo</h3>
-            <p>
-              Todas as regras oficiais implementadas para uma experiência
-              autêntica.
-            </p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-undo-alt"></i></div>
-            <h3 class="feature-title">Desfazer Jogadas</h3>
-            <p>Corrija movimentos errados e refine sua estratégia.</p>
-          </div>
-          <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-history"></i></div>
-            <h3 class="feature-title">Histórico de Partidas</h3>
-            <p>Acompanhe todos os movimentos realizados durante o jogo.</p>
-          </div>
+      <div class="features">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-chess-king"></i></div>
+          <h3 class="feature-title">Jogo Completo</h3>
+          <p>
+            Todas as regras oficiais implementadas para uma experiência
+            autêntica.
+          </p>
         </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-undo-alt"></i></div>
+          <h3 class="feature-title">Desfazer Jogadas</h3>
+          <p>Corrija movimentos errados e refine sua estratégia.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-history"></i></div>
+          <h3 class="feature-title">Histórico de Partidas</h3>
+          <p>Acompanhe todos os movimentos realizados durante o jogo.</p>
+        </div>
+      </div>
 
-        <button class="start-button" id="startButton" onclick="window.location.href='Jogo.html'">
-          <i class="fas fa-play"></i> Iniciar Jogo
+      <button class="start-button" id="startButton">
+        <i class="fas fa-sign-in-alt"></i> Iniciar Sessão
       </button>
+    </div>
+
+    <!-- Tela de login -->
+    <div class="login-screen" id="loginScreen">
+      <div class="close-login" id="closeLogin">
+        <i class="fas fa-times"></i>
+      </div>
+      <div class="login-form">
+        <div class="login-header">
+          <i class="fas fa-chess-knight"></i>
+          <h2>Entrar no Xadrez Premium</h2>
+          <p>Faça login para começar a jogar</p>
+        </div>
+        
+        <div class="input-group">
+          <label for="username"><i class="fas fa-user"></i> Nome de Usuário</label>
+          <input type="text" id="username" placeholder="Digite seu usuário" autocomplete="off">
+        </div>
+        
+        <div class="input-group">
+          <label for="password"><i class="fas fa-lock"></i> Senha</label>
+          <input type="password" id="password" placeholder="Digite sua senha">
+        </div>
+        
+        <div class="login-options">
+          <div class="remember-me">
+            <input type="checkbox" id="remember">
+            <label for="remember">Lembrar-me</label>
+          </div>
+          <a href="#" class="forgot-password">Esqueceu a senha?</a>
+        </div>
+        
+        <button class="login-button" id="loginButton">
+          <i class="fas fa-chess-board"></i> Entrar no Jogo
+        </button>
+        
+        <div class="login-footer">
+          <p>Não tem uma conta? <a href="#" id="registerLink">Registre-se agora</a></p>
+        </div>
       </div>
     </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const startButton = document.getElementById("startButton");
+    <!-- Tela do jogo (simulação) -->
+    <div class="game-screen" id="gameScreen">
+      <div class="game-container">
+        <div class="game-header">
+          <h2>Partida em Andamento</h2>
+          <p>Bem-vindo ao Xadrez Premium, <span id="playerName">Jogador</span>!</p>
+        </div>
         
-        // Redirecionar para a página do jogo
-        startButton.addEventListener("click", () => {
-          window.location.href = "jogo.html";
-        });
+        <div class="chess-board">
+          <!-- Linha 1 -->
+          <div class="board-row">
+            <div class="board-square black">&#9820;</div>
+            <div class="board-square white">&#9822;</div>
+            <div class="board-square black">&#9821;</div>
+            <div class="board-square white">&#9819;</div>
+            <div class="board-square black">&#9818;</div>
+            <div class="board-square white">&#9821;</div>
+            <div class="board-square black">&#9822;</div>
+            <div class="board-square white">&#9820;</div>
+          </div>
+          
+          <!-- Linha 2 -->
+          <div class="board-row">
+            <div class="board-square white">&#9821;</div>
+            <div class="board-square black">&#9823;</div>
+            <div class="board-square white">&#9823;</div>
+            <div class="board-square black">&#9823;</div>
+            <div class="board-square white">&#9823;</div>
+            <div class="board-square black">&#9823;</div>
+            <div class="board-square white">&#9823;</div>
+            <div class="board-square black">&#9823;</div>
+          </div>
+          
+          <!-- Linhas 3-6 (vazias) -->
+          <div class="board-row">
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+          </div>
+          <div class="board-row">
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+          </div>
+          <div class="board-row">
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+          </div>
+          <div class="board-row">
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+            <div class="board-square white"></div>
+            <div class="board-square black"></div>
+          </div>
+          
+          <!-- Linha 7 -->
+          <div class="board-row">
+            <div class="board-square black">&#9817;</div>
+            <div class="board-square white">&#9817;</div>
+            <div class="board-square black">&#9817;</div>
+            <div class="board-square white">&#9817;</div>
+            <div class="board-square black">&#9817;</div>
+            <div class="board-square white">&#9817;</div>
+            <div class="board-square black">&#9817;</div>
+            <div class="board-square white">&#9817;</div>
+          </div>
+          
+          <!-- Linha 8 -->
+          <div class="board-row">
+            <div class="board-square white">&#9814;</div>
+            <div class="board-square black">&#9816;</div>
+            <div class="board-square white">&#9815;</div>
+            <div class="board-square black">&#9813;</div>
+            <div class="board-square white">&#9812;</div>
+            <div class="board-square black">&#9815;</div>
+            <div class="board-square white">&#9816;</div>
+            <div class="board-square black">&#9814;</div>
+          </div>
+        </div>
+        
+        <div class="game-info">
+          <div class="player-info">
+            <div class="player player-white">
+              <div class="player-icon"><i class="fas fa-chess-pawn"></i></div>
+              <div>Você (Brancas)</div>
+            </div>
+            <div class="player player-black">
+              <div class="player-icon"><i class="fas fa-chess-pawn"></i></div>
+              <div>Oponente (Pretas)</div>
+            </div>
+          </div>
+          <p>Seu turno - Faça sua jogada!</p>
+        </div>
+        
+        <button class="back-to-menu" id="backToMenu">
+          <i class="fas fa-arrow-left"></i> Voltar ao Menu
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const welcomeScreen = document.getElementById("welcomeScreen");
+      const loginScreen = document.getElementById("loginScreen");
+      const gameScreen = document.getElementById("gameScreen");
+      const startButton = document.getElementById("startButton");
+      const closeLogin = document.getElementById("closeLogin");
+      const loginButton = document.getElementById("loginButton");
+      const registerLink = document.getElementById("registerLink");
+      const backToMenu = document.getElementById("backToMenu");
+      const usernameInput = document.getElementById("username");
+      const passwordInput = document.getElementById("password");
+      const playerName = document.getElementById("playerName");
+
+      // Mostrar tela de login
+      startButton.addEventListener("click", () => {
+        loginScreen.classList.add("active");
       });
-    </script>
-  </body>
+
+      // Fechar tela de login
+      closeLogin.addEventListener("click", () => {
+        loginScreen.classList.remove("active");
+      });
+
+      // Tentar fazer login
+      loginButton.addEventListener("click", () => {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+        
+        if (!username) {
+          showError(usernameInput, "Por favor, digite seu nome de usuário");
+          return;
+        }
+        
+        if (!password) {
+          showError(passwordInput, "Por favor, digite sua senha");
+          return;
+        }
+        
+        if (password.length < 6) {
+          showError(passwordInput, "A senha deve ter pelo menos 6 caracteres");
+          return;
+        }
+        
+        // Login bem-sucedido
+        playerName.textContent = username;
+        loginScreen.classList.remove("active");
+        setTimeout(() => {
+          gameScreen.classList.add("active");
+        }, 300);
+      });
+
+      // Registrar nova conta
+      registerLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        alert("Registro de conta selecionado! Em uma implementação real, esta ação abriria um formulário de cadastro.");
+      });
+
+      // Voltar ao menu principal
+      backToMenu.addEventListener("click", () => {
+        gameScreen.classList.remove("active");
+        setTimeout(() => {
+          welcomeScreen.style.display = "flex";
+        }, 500);
+      });
+
+      // Função para mostrar erros
+      function showError(input, message) {
+        const inputGroup = input.parentElement;
+        inputGroup.classList.add("error");
+        
+        // Criar elemento de erro se não existir
+        let errorElement = inputGroup.querySelector(".error-message");
+        if (!errorElement) {
+          errorElement = document.createElement("p");
+          errorElement.className = "error-message";
+          errorElement.style.color = "#ff6b6b";
+          errorElement.style.marginTop = "8px";
+          errorElement.style.fontSize = "0.9rem";
+          inputGroup.appendChild(errorElement);
+        }
+        
+        errorElement.textContent = message;
+        
+        // Adicionar animação de shake
+        inputGroup.style.animation = "shake 0.5s";
+        setTimeout(() => {
+          inputGroup.style.animation = "";
+        }, 500);
+        
+        // Focar no campo com erro
+        input.focus();
+      }
+
+      // Remover erro ao digitar
+      usernameInput.addEventListener("input", () => {
+        clearError(usernameInput);
+      });
+      
+      passwordInput.addEventListener("input", () => {
+        clearError(passwordInput);
+      });
+      
+      function clearError(input) {
+        const inputGroup = input.parentElement;
+        if (inputGroup.classList.contains("error")) {
+          inputGroup.classList.remove("error");
+          const errorElement = inputGroup.querySelector(".error-message");
+          if (errorElement) {
+            errorElement.remove();
+          }
+        }
+      }
+    });
+  </script>
+</body>
 </html>
