@@ -1,0 +1,22 @@
+<!-- Adicionar nova tela multiplayer -->
+<div id="multiplayerScreen" style="display: none">
+  <div>
+    <h2>Modo Multiplayer</h2>
+    <div id="createSection">
+      <input type="text" id="usernameCreate" placeholder="Seu nome" />
+      <button id="createRoomBtn">Criar Sala</button>
+    </div>
+    <div id="joinSection">
+      <input type="text" id="usernameJoin" placeholder="Seu nome" />
+      <input type="text" id="roomCode" placeholder="Código da Sala" />
+      <button id="joinRoomBtn">Entrar</button>
+    </div>
+    <div id="roomInfo" style="display: none">
+      <p>Sala: <span id="roomCodeDisplay"></span></p>
+      <p>Jogadores:</p>
+      <ul id="playerList"></ul>
+      <p id="waitingMessage">Aguardando oponente...</p>
+    </div>
+    <button id="backToMenuMultiplayer">Voltar</button>
+  </div>
+</div>

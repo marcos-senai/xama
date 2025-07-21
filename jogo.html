@@ -327,7 +327,14 @@
             </ul>
         </div>
     </div>
-    
+    <div class="timers">
+        <div>Brancas: <span id="white-timer">10:00</span></div>
+        <div>Pretas: <span id="black-timer">10:00</span></div>
+      </div>
+ <div class="timers">
+        <div id="white-timer">10:00</div>
+        <div id="black-timer">10:00</div>
+    </div>></div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Elementos do DOM
@@ -956,6 +963,8 @@
             // Iniciar o jogo
             initGame();
         });
-    </script>
+        <!-- Vincular JS/CSS -->
+</script>script src="jogo.js"></script><!-- Adicionar antes do fechamento do body -->
+<script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
 </body>
 </html>
